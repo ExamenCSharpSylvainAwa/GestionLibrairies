@@ -194,7 +194,14 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
 
+    ],
+
+    'aliases' => [
+        // ...
+        'PDF' => Barryvdh\DomPDF\Facade::class,
+        'File' => Illuminate\Support\Facades\File::class,
     ],
 
     /*
