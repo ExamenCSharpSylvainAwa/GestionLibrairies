@@ -10,21 +10,26 @@ class Order extends Model
     use HasFactory;
     protected $fillable = [
         'user_id',
-        'book_id',
-        'quantity',
-        'total_price',
+        'total_amount',
+        'status',
+        'payment_date',
+        'payment_amount',
+    ];
+
+    protected $dates = [
+        'payment_date',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
-    public function book()
+    public function books()
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsToMany(Book::class, 'book_order')
+                    ->withPivot('quantity', 'price')
+                    ->withTimestamps();
     }
-
     public function payment()
     {
         return $this->hasOne(Payment::class);

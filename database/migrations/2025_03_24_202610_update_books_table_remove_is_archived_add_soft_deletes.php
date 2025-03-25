@@ -12,8 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('books', function (Blueprint $table) {
-            $table->dropColumn('is_archived'); // Supprime le champ is_archived
-            $table->softDeletes(); // Ajoute la colonne deleted_at
+            // Supprimer la colonne is_archived si elle existe
+            if (Schema::hasColumn('books', 'is_archived')) {
+                $table->dropColumn('is_archived');
+            }
+
+            // Ajouter la colonne deleted_at si elle n'existe pas
+            if (!Schema::hasColumn('books', 'deleted_at')) {
+                $table->softDeletes();
+            }
         });
     }
 
@@ -23,8 +30,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('books', function (Blueprint $table) {
-            $table->dropSoftDeletes(); // Supprime la colonne deleted_at
-            $table->boolean('is_archived')->default(false); // Rétablit le champ is_archived
+            // Restaure la colonne is_archived si elle n'existe pas
+            if (!Schema::hasColumn('books', 'is_archived')) {
+                $table->boolean('is_archived')->default(false);
+            }
+
+            // Supprime la colonne deleted_at si elle existe
+            if (Schema::hasColumn('books', 'deleted_at')) {
+                $table->dropSoftDeletes();
+            }
         });
     }
 };

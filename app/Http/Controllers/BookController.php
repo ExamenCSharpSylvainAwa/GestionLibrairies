@@ -8,17 +8,22 @@ class BookController extends Controller
 {
     public function index(Request $request)
     {
-        $books = Book::query()
-            ->when($request->category, function ($query, $category) {
-                return $query->where('category', 'like', "%{$category}%");
-            })
-            ->when($request->author, function ($query, $author) {
-                return $query->where('author', 'like', "%{$author}%");
-            })
-            ->when($request->price, function ($query, $price) {
-                return $query->where('price', '<=', $price);
-            })
-            ->get();
+        $query = Book::query();
+
+        
+        if ($request->filled('category')) {
+            $query->where('category', 'like', '%' . $request->input('category') . '%');
+        }
+
+        if ($request->filled('author')) {
+            $query->where('author', 'like', '%' . $request->input('author') . '%');
+        }
+
+        if ($request->filled('price')) {
+            $query->where('price', '<=', $request->input('price'));
+        }
+
+        $books = $query->get();
 
         return view('books.index', compact('books'));
     }
@@ -141,5 +146,10 @@ class BookController extends Controller
         $book->restore();
 
         return redirect()->route('books.archived')->with('success', 'Livre restauré avec succès.');
+    }
+
+    public function show(Book $book)
+    {
+        return view('books.show', compact('book'));
     }
 }

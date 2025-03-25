@@ -12,11 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            Schema::table('orders', function (Blueprint $table) {
-                $table->string('status')->default('En attente'); 
-                $table->dateTime('payment_date')->nullable(); 
-                $table->decimal('payment_amount', 8, 2)->nullable(); 
-            });
+            if (!Schema::hasColumn('orders', 'status')) {
+                $table->string('status')->default('En attente');
+            }
+            if (!Schema::hasColumn('orders', 'payment_date')) {
+                $table->timestamp('payment_date')->nullable();
+            }
+            if (!Schema::hasColumn('orders', 'payment_amount')) {
+                $table->decimal('payment_amount', 8, 2)->nullable();
+            }
         });
     }
 
@@ -26,9 +30,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            Schema::table('orders', function (Blueprint $table) {
-                $table->dropColumn(['status', 'payment_date', 'payment_amount']);
-            });
+            if (Schema::hasColumn('orders', 'status')) {
+                $table->dropColumn('status');
+            }
+            if (Schema::hasColumn('orders', 'payment_date')) {
+                $table->dropColumn('payment_date');
+            }
+            if (Schema::hasColumn('orders', 'payment_amount')) {
+                $table->dropColumn('payment_amount');
+            }
         });
     }
 };

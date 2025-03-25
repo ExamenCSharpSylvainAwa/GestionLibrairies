@@ -257,19 +257,28 @@
                                 <td style="padding: 15px;">{{ $order->status }}</td>
                                 <td style="padding: 15px;">{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                 <td style="padding: 15px;">
-                                    @if (auth()->check())
-                                        @if (auth()->user()->isGestionnaire() || (auth()->user()->id === $order->user_id && $order->status === 'En attente'))
-                                            <a href="{{ route('orders.edit', $order->id) }}" class="btn btn-warning btn-icon" title="Modifier">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="{{ route('orders.destroy', $order->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande ?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-icon" title="Supprimer">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        @endif
+                                    <!-- Actions pour les gestionnaires -->
+                                    @if (auth()->check() && auth()->user()->isGestionnaire())
+                                        <a href="{{ route('orders.edit', $order->id) }}" class="btn btn-warning btn-icon" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('orders.destroy', $order->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande ?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-icon" title="Supprimer">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                    <!-- Action pour les clients : Annuler la commande -->
+                                    @if (auth()->check() && !auth()->user()->isGestionnaire() && auth()->user()->id === $order->user_id && $order->status === 'pending')
+                                        <form action="{{ route('orders.cancel', $order->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-icon" title="Annuler">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
                                     @endif
                                 </td>
                             </tr>

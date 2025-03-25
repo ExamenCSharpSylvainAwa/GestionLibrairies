@@ -39,7 +39,7 @@
         header {
             background-color: var(--primary);
             color: white;
-            padding: 30px 0;
+            padding: 20px 0;
             margin-bottom: 40px;
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(44, 62, 80, 0.1);
@@ -51,6 +51,29 @@
             justify-content: space-between;
             align-items: center;
             padding: 0 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .header-left {
+            flex: 1;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+        
+        .user-info span {
+            color: var(--light);
         }
         
         h1 {
@@ -63,6 +86,12 @@
         .header-subtitle {
             font-size: 1.1rem;
             opacity: 0.8;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         
         .btn {
@@ -116,6 +145,17 @@
         .btn-danger:hover {
             background-color: #c0392b;
             transform: translateY(-2px);
+        }
+        
+        .btn-icon {
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
         }
         
         .filter-section {
@@ -252,28 +292,17 @@
             text-align: center;
         }
         
-        /* Option 1 : Alignement vertical des boutons */
         .admin-actions {
             display: flex;
-            flex-direction: column; /* Alignement vertical */
+            flex-direction: column;
             gap: 10px;
-            align-items: flex-end; /* Alignement à droite */
+            align-items: flex-end;
         }
-        
-        /* Option 2 : Alignement horizontal centré (commentée, décommente pour tester) */
-        /*
-        .admin-actions {
-            display: flex;
-            justify-content: center; 
-            gap: 15px;
-            width: 100%; 
-        }
-        */
         
         .btn-sm {
             padding: 8px 16px;
             font-size: 0.85rem;
-            width: 100%; /* Pour que les boutons aient la même largeur en alignement vertical */
+            width: 100%;
         }
         
         .empty-state {
@@ -296,6 +325,15 @@
                 gap: 20px;
             }
             
+            .header-right {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-buttons {
+                justify-content: center;
+            }
+            
             .filter-group {
                 flex: 1 1 100%;
             }
@@ -305,7 +343,7 @@
             }
             
             .admin-actions {
-                align-items: center; /* Centre les boutons sur mobile */
+                align-items: center;
             }
         }
     </style>
@@ -314,19 +352,50 @@
     <div class="container">
         <header>
             <div class="header-content">
-                <div>
-                    <h1>Catalogue des Livres</h1>
-                    <p class="header-subtitle">Découvrez notre collection exceptionnelle</p>
-                </div>
-                <div class="admin-button">
-                    @if (auth()->user()->isGestionnaire())
-                        <a href="{{ route('books.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus-circle"></i> Ajouter un livre
-                        </a>
-                        <a href="{{ route('books.archived') }}" class="btn btn-warning">
-                            <i class="fas fa-archive"></i> Voir les livres archivés
-                        </a>
+                <div class="header-left">
+                    @if (auth()->check() && auth()->user()->isGestionnaire())
+                        <h1>Tableau de Bord - Gestionnaire</h1>
+                        <p class="header-subtitle">Gérez le catalogue des livres</p>
+                    @else
+                        <h1>Catalogue des Livres</h1>
+                        <p class="header-subtitle">Découvrez notre collection exceptionnelle</p>
                     @endif
+                </div>
+                <div class="header-right">
+                    @if (auth()->check())
+                        <div class="user-info">
+                            <span>Bonjour, {{ auth()->user()->name }}</span>
+                        </div>
+                    @endif
+                    <div class="nav-buttons">
+                        @if (auth()->check() && auth()->user()->isGestionnaire())
+                            <a href="{{ route('books.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus-circle"></i> Ajouter un livre
+                            </a>
+                            <a href="{{ route('books.archived') }}" class="btn btn-warning">
+                                <i class="fas fa-archive"></i> Voir les livres archivés
+                            </a>
+                            <a href="{{ route('orders.index') }}" class="btn btn-primary">
+                                <i class="fas fa-list"></i> Toutes les Commandes
+                            </a>
+                        @elseif (auth()->check() && !auth()->user()->isGestionnaire())
+                            <a href="{{ route('orders.my_orders') }}" class="btn btn-primary">
+                                <i class="fas fa-list"></i> Mes Commandes
+                            </a>
+                        @endif
+                        @if (auth()->check())
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-danger btn-icon" title="Déconnexion">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt"></i> Connexion
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </div>
         </header>
@@ -339,6 +408,15 @@
         @if (session('error'))
             <div class="alert alert-danger" style="background-color: var(--danger); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                 {{ session('error') }}
+            </div>
+        @endif
+        @if ($errors->any())
+            <div class="alert alert-danger" style="background-color: var(--danger); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         @endif
         
@@ -372,7 +450,11 @@
                     <div class="book-card">
                         <img src="{{ $book->image ? url('storage/' . $book->image) : 'https://placehold.co/400x320' }}" alt="{{ $book->title }}" class="book-image">
                         <div class="book-details">
-                            <h3 class="book-title">{{ $book->title }}</h3>
+                            <h3 class="book-title">
+                                <a href="{{ route('books.show', $book) }}" style="text-decoration: none; color: inherit;">
+                                    {{ $book->title }}
+                                </a>
+                            </h3>
                             <div class="book-info">
                                 <span class="book-author">{{ $book->author }}</span>
                                 <span class="book-price">{{ number_format($book->price, 2) }} FCFA</span>
@@ -388,8 +470,8 @@
                                 @if (auth()->check() && !auth()->user()->isGestionnaire() && $book->stock > 0)
                                     <form class="order-form" method="POST" action="{{ route('orders.store') }}">
                                         @csrf
-                                        <input type="hidden" name="book_id" value="{{ $book->id }}">
-                                        <input type="number" name="quantity" value="1" min="1" max="{{ $book->stock }}" class="quantity-input">
+                                        <input type="hidden" name="books[0][id]" value="{{ $book->id }}">
+                                        <input type="number" name="books[0][quantity]" value="1" min="1" max="{{ $book->stock }}" class="quantity-input">
                                         <button type="submit" class="btn btn-success btn-sm">
                                             <i class="fas fa-shopping-cart"></i> Commander
                                         </button>
@@ -397,7 +479,7 @@
                                 @elseif ($book->stock <= 0)
                                     <p class="text-danger">Rupture de stock</p>
                                 @endif
-                                @if (auth()->user()->isGestionnaire())
+                                @if (auth()->check() && auth()->user()->isGestionnaire())
                                     <div class="admin-actions">
                                         <a href="{{ route('books.edit', $book) }}" class="btn btn-warning btn-sm">
                                             <i class="fas fa-edit"></i> Modifier

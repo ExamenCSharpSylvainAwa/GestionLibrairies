@@ -35,14 +35,14 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:client,gestionnaire'],
+            'role' => ['required', 'in:gestionnaire,client'],
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => ['required', 'in:client,gestionnaire'],
+            
         ]);
 
         UserRole::create([
@@ -52,8 +52,7 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
+      
 
-        return redirect(route('books.index'));
-    }
+        return redirect()->route('login')->with('success', 'Inscription réussie ! Veuillez vous connecter.');    }
 }

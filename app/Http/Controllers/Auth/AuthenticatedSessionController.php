@@ -29,7 +29,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended('books.index');
+        return redirect()->intended(route('books.index')); 
     }
 
     /**

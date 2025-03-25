@@ -40,18 +40,31 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Relation avec les commandes (orders).
+     */
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
 
-    public function role()
+    /**
+     * Relation avec le rôle de l'utilisateur.
+     */
+    public function roles()
     {
-        return $this->hasOne(UserRole::class);
+        return $this->hasMany(UserRole::class, 'user_id');
     }
 
+    /**
+     * Vérifie si l'utilisateur est un gestionnaire.
+     *
+     * @return bool
+     */
     public function isGestionnaire()
     {
-        return $this->role && $this->role->role === 'gestionnaire';
+        return $this->roles()->where('role', 'gestionnaire')->exists();
     }
+
+  
 }

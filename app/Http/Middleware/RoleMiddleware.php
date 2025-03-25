@@ -4,23 +4,30 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class RoleMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  string  $role
+     * @return mixed
      */
-    public function handle(Request $request, Closure $next, $role): Response
+    public function handle(Request $request, Closure $next, $role)
     {
-        // Vérifie si l'utilisateur est connecté et a le rôle spécifié
-        if ($request->user() && $request->user()->isGestionnaire() && $role === 'gestionnaire') {
-            return $next($request);
+        // Vérifie si l'utilisateur est connecté
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Vous devez être connecté pour accéder à cette page.');
         }
 
-        // Si l'utilisateur n'a pas le rôle requis, retourne une erreur 403
-        abort(403, 'Accès non autorisé. Vous devez être gestionnaire pour accéder à cette page.');
+        // Vérifie si l'utilisateur a le rôle requis
+        if (!Auth::user()->isGestionnaire() && $role === 'gestionnaire') {
+            return redirect()->route('books.index')->with('error', 'Accès non autorisé : vous n\'êtes pas un gestionnaire.');
+        }
+
+        return $next($request);
     }
 }
