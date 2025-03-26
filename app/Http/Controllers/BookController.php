@@ -2,30 +2,50 @@
 
 namespace App\Http\Controllers;
 use App\Models\Book;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Book::query();
+        // Valider les paramètres de filtrage
+        $validated = $request->validate([
+            'category' => 'nullable|string|max:255',
+            'author' => 'nullable|string|max:255',
+            'price' => 'nullable|numeric|min:0',
+        ]);
 
-        
-        if ($request->filled('category')) {
-            $query->where('category', 'like', '%' . $request->input('category') . '%');
+        // Récupérer les paramètres de filtrage
+        $category = trim($request->query('category', ''));
+        $author = trim($request->query('author', ''));
+        $price = $request->query('price') ? (float) $request->query('price') : null;
+
+        // Construire la requête pour les livres
+        $query = Book::query()->where('archived', false);
+
+        // Appliquer les filtres
+        if (!empty($category)) {
+            $query->where('category', 'ilike', '%' . $category . '%'); // Recherche insensible à la casse (PostgreSQL)
         }
 
-        if ($request->filled('author')) {
-            $query->where('author', 'like', '%' . $request->input('author') . '%');
+        if (!empty($author)) {
+            $query->where('author', 'ilike', '%' . $author . '%'); // Recherche insensible à la casse (PostgreSQL)
         }
 
-        if ($request->filled('price')) {
-            $query->where('price', '<=', $request->input('price'));
+        if ($price !== null && $price >= 0) {
+            $query->where('price', '<=', $price);
         }
 
-        $books = $query->get();
+        // Récupérer les livres avec pagination (10 livres par page)
+        $books = $query->paginate(10)->appends($request->query()); // Ligne 41, où l'erreur se produit
 
-        return view('books.index', compact('books'));
+        // Récupérer les commandes de l'utilisateur connecté (pour les clients)
+        $orders = auth()->check() && !auth()->user()->isGestionnaire()
+            ? Order::where('user_id', auth()->id())->with('books')->get()
+            : collect();
+
+        return view('books.index', compact('books', 'orders'));
     }
 
     public function create()

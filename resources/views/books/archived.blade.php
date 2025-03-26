@@ -181,6 +181,33 @@
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
+
+        /* Style pour le footer (harmonisé avec books/index.blade.php) */
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.1); /* Même box-shadow que le header */
+            background-image: linear-gradient(135deg, #2c3e50 0%, #4a6785 100%); /* Même dégradé que le header */
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 0 40px; /* Même padding que .header-content */
+        }
+
+        .footer-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
         
         @media (max-width: 768px) {
             .header-content {
@@ -191,6 +218,12 @@
             
             .books-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+                padding: 0 20px; /* Ajustement pour mobile */
             }
         }
     </style>
@@ -259,6 +292,13 @@
             @endif
         </section>
     </div>
+
+    <!-- Footer (identique à books/index.blade.php) -->
+    <footer>
+        <div class="footer-content">
+            <p>© {{ date('Y') }} Gestion Librairies. Tous droits réservés.</p>
+        </div>
+    </footer>
 
     <script>
         // Fonction de confirmation pour la restauration

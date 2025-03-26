@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <title>Détails de la Commande</title>
+    <title>Passer une Commande</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Styles similaires à ceux de my_orders.blade.php */
         :root {
             --primary: #2c3e50;
             --secondary: #3498db;
@@ -16,6 +15,7 @@
             --success: #2ecc71;
             --warning: #f39c12;
             --danger: #e74c3c;
+            --border-color: #e0e0e0;
         }
 
         * {
@@ -79,7 +79,8 @@
         }
 
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             padding: 12px 24px;
             border-radius: 30px;
             text-decoration: none;
@@ -106,7 +107,7 @@
         }
 
         .btn-danger {
-            background-color: var(--danger);
+            background-color: #e74c3c;
             color: white;
         }
 
@@ -126,7 +127,7 @@
             font-size: 1.2rem;
         }
 
-        .order-details {
+        .form-section {
             background-color: white;
             padding: 30px;
             border-radius: 10px;
@@ -134,14 +135,30 @@
             margin-bottom: 40px;
         }
 
-        .order-details h2 {
-            font-size: 1.5rem;
+        .form-group {
             margin-bottom: 20px;
         }
 
-        .order-details p {
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             font-size: 1rem;
-            margin-bottom: 10px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
 
         table {
@@ -150,7 +167,7 @@
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
 
         th, td {
@@ -212,6 +229,17 @@
         }
 
         @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+
+            .header-right {
+                flex-direction: column;
+                gap: 10px;
+            }
+
             .footer-content {
                 flex-direction: column;
                 gap: 10px;
@@ -225,21 +253,19 @@
         <header>
             <div class="header-content">
                 <div class="header-left">
-                    <h1>Détails de la Commande #{{ $order->id }}</h1>
-                    <p class="header-subtitle">Informations sur la commande</p>
+                    <h1>Passer une Commande</h1>
+                    <p class="header-subtitle">Sélectionnez les livres à commander</p>
                 </div>
                 <div class="header-right">
-                    <a href="{{ auth()->user()->isGestionnaire() ? route('orders.index') : route('orders.my_orders') }}" class="btn btn-primary">
+                    <a href="{{ route('orders.my_orders') }}" class="btn btn-primary">
                         <i class="fas fa-arrow-left"></i> Retour
                     </a>
-                    @if (auth()->check())
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-danger btn-icon" title="Déconnexion">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </button>
-                        </form>
-                    @endif
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-danger btn-icon" title="Déconnexion">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </header>
@@ -254,39 +280,52 @@
                 {{ session('error') }}
             </div>
         @endif
-
-        <section class="order-details">
-            <h2>Informations de la Commande</h2>
-            <p><strong>Utilisateur :</strong> {{ $order->user->name }}</p>
-            <p><strong>Statut :</strong> 
-              
-                    {{ $order->status->label() }}
-               
-            </p>
-            <p><strong>Montant Total :</strong> {{ number_format($order->total_amount, 2) }} FCFA</p>
-            <p><strong>Date de Création :</strong> {{ $order->created_at->format('d/m/Y H:i') }}</p>
-
-            <h2>Livres Commandés</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Titre</th>
-                        <th>Quantité</th>
-                        <th>Prix Unitaire</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($order->books as $book)
-                        <tr>
-                            <td>{{ $book->title }}</td>
-                            <td>{{ $book->pivot->quantity }}</td>
-                            <td>{{ number_format($book->pivot->price, 2) }} FCFA</td>
-                            <td>{{ number_format($book->pivot->price * $book->pivot->quantity, 2) }} FCFA</td>
-                        </tr>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
                     @endforeach
-                </tbody>
-            </table>
+                </ul>
+            </div>
+        @endif
+
+        <section class="form-section">
+            <form action="{{ route('orders.store') }}" method="POST" id="order-form">
+                @csrf
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Titre</th>
+                            <th>Auteur</th>
+                            <th>Prix</th>
+                            <th>Stock</th>
+                            <th>Quantité</th>
+                            <th>Sélectionner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($books as $book)
+                            <tr>
+                                <td>{{ $book->title }}</td>
+                                <td>{{ $book->author }}</td>
+                                <td>{{ number_format($book->price, 2) }} FCFA</td>
+                                <td>{{ $book->stock }}</td>
+                                <td>
+                                    <input type="number" name="books[{{ $book->id }}][quantity]" class="form-control book-quantity" min="1" max="{{ $book->stock }}" value="1" {{ $book->stock > 0 ? '' : 'disabled' }}>
+                                    <input type="hidden" name="books[{{ $book->id }}][id]" class="book-id" value="{{ $book->id }}" {{ $book->stock > 0 ? '' : 'disabled' }}>
+                                </td>
+                                <td>
+                                    <input type="checkbox" class="book-checkbox" {{ $book->stock > 0 ? '' : 'disabled' }}>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-shopping-cart"></i> Valider la Commande
+                </button>
+            </form>
         </section>
     </div>
 
@@ -295,5 +334,34 @@
             <p>© {{ date('Y') }} Gestion Librairies. Tous droits réservés.</p>
         </div>
     </footer>
+
+    <script>
+        document.getElementById('order-form').addEventListener('submit', function(event) {
+            const checkboxes = document.querySelectorAll('.book-checkbox');
+            let atLeastOneSelected = false;
+
+            checkboxes.forEach(checkbox => {
+                const row = checkbox.closest('tr');
+                const quantityInput = row.querySelector('.book-quantity');
+                const idInput = row.querySelector('.book-id');
+
+                if (checkbox.checked) {
+                    atLeastOneSelected = true;
+                    // S'assurer que les champs sont inclus dans la soumission
+                    quantityInput.removeAttribute('disabled');
+                    idInput.removeAttribute('disabled');
+                } else {
+                    // Supprimer les champs pour les livres non sélectionnés
+                    quantityInput.removeAttribute('name');
+                    idInput.removeAttribute('name');
+                }
+            });
+
+            if (!atLeastOneSelected) {
+                event.preventDefault();
+                alert('Veuillez sélectionner au moins un livre pour passer une commande.');
+            }
+        });
+    </script>
 </body>
 </html>

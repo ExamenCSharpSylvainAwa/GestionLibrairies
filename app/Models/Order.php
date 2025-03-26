@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\OrderStatus;
 
 class Order extends Model
 {
@@ -14,10 +15,16 @@ class Order extends Model
         'status',
         'payment_date',
         'payment_amount',
+        'payment_method',
     ];
 
     protected $dates = [
         'payment_date',
+    ];
+
+    protected $casts = [
+        'status' => OrderStatus::class, 
+        'payment_date' => 'datetime',   
     ];
 
     public function user()

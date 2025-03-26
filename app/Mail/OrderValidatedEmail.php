@@ -5,25 +5,34 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use App\Models\Order;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InvoiceMail extends Mailable
+class OrderValidatedEmail extends Mailable
 {
     use Queueable, SerializesModels;
     public $order;
-    public $pdfPath;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($order, $pdfPath)
+    /**
+     * Create a new message instance.
+     *
+     * @param Order $order
+     */
+    public function __construct(Order $order)
     {
         $this->order = $order;
-        $this->pdfPath = $pdfPath;
-        $this->onQueue('emails');
-    }
+        $this->onQueue('emails');   
+     }
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
 
     /**
      * Get the message envelope.
@@ -31,21 +40,14 @@ class InvoiceMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Invoice Mail',
+            subject: 'Order Validated Email',
         );
     }
 
-    /**
-     * Build the message.
-     */
     public function build()
     {
-        return $this->subject('Votre facture pour la commande #' . $this->order->id)
-            ->view('emails.invoice')
-            ->attach($this->pdfPath, [
-                'as' => 'facture-commande-' . $this->order->id . '.pdf',
-                'mime' => 'application/pdf',
-            ]);
+        return $this->subject('Nouvelle commande validée #' . $this->order->id)
+                    ->view('emails.order_validated_notification');
     }
 
     /**
@@ -54,7 +56,7 @@ class InvoiceMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            markdown: 'emails.order_validated',
         );
     }
 

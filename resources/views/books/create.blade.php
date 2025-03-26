@@ -128,12 +128,45 @@
             font-weight: 600;
             color: var(--dark);
         }
+
+        /* Style pour le footer (harmonisé avec books/index.blade.php) */
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.1);
+            background-image: linear-gradient(135deg, #2c3e50 0%, #4a6785 100%);
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 0 40px;
+        }
+
+        .footer-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
         
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
                 text-align: center;
                 gap: 20px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+                padding: 0 20px; /* Ajustement pour mobile */
             }
         }
     </style>
@@ -208,5 +241,12 @@
             </form>
         </section>
     </div>
+
+    <!-- Footer (identique à books/index.blade.php) -->
+    <footer>
+        <div class="footer-content">
+            <p>© {{ date('Y') }} Gestion Librairies. Tous droits réservés.</p>
+        </div>
+    </footer>
 </body>
 </html>

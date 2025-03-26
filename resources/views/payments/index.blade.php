@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <title>Détails de la Commande</title>
+    <title>Liste des Paiements</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Styles similaires à ceux de my_orders.blade.php */
         :root {
             --primary: #2c3e50;
             --secondary: #3498db;
@@ -91,10 +90,6 @@
             font-size: 0.9rem;
         }
 
-        .btn i {
-            margin-right: 8px;
-        }
-
         .btn-primary {
             background-color: var(--secondary);
             color: white;
@@ -126,31 +121,12 @@
             font-size: 1.2rem;
         }
 
-        .order-details {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            margin-bottom: 40px;
-        }
-
-        .order-details h2 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-        }
-
-        .order-details p {
-            font-size: 1rem;
-            margin-bottom: 10px;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            margin-top: 20px;
         }
 
         th, td {
@@ -167,57 +143,6 @@
         tr:hover {
             background-color: #f9f9f9;
         }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 1rem;
-        }
-
-        .alert-success {
-            background-color: var(--success);
-            color: white;
-        }
-
-        .alert-danger {
-            background-color: var(--danger);
-            color: white;
-        }
-
-        footer {
-            background-color: var(--primary);
-            color: white;
-            padding: 20px 0;
-            margin-top: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.1);
-            background-image: linear-gradient(135deg, #2c3e50 0%, #4a6785 100%);
-            text-align: center;
-        }
-
-        .footer-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            padding: 0 40px;
-        }
-
-        .footer-content p {
-            margin: 0;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        @media (max-width: 768px) {
-            .footer-content {
-                flex-direction: column;
-                gap: 10px;
-                padding: 0 20px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -225,11 +150,11 @@
         <header>
             <div class="header-content">
                 <div class="header-left">
-                    <h1>Détails de la Commande #{{ $order->id }}</h1>
-                    <p class="header-subtitle">Informations sur la commande</p>
+                    <h1>Liste des Paiements</h1>
+                    <p class="header-subtitle">Gérez les paiements des commandes</p>
                 </div>
                 <div class="header-right">
-                    <a href="{{ auth()->user()->isGestionnaire() ? route('orders.index') : route('orders.my_orders') }}" class="btn btn-primary">
+                    <a href="{{ route('books.index') }}" class="btn btn-primary">
                         <i class="fas fa-arrow-left"></i> Retour
                     </a>
                     @if (auth()->check())
@@ -245,55 +170,42 @@
         </header>
 
         @if (session('success'))
-            <div class="alert alert-success">
+            <div class="alert alert-success" style="background-color: var(--success); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                 {{ session('success') }}
             </div>
         @endif
         @if (session('error'))
-            <div class="alert alert-danger">
+            <div class="alert alert-danger" style="background-color: var(--danger); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                 {{ session('error') }}
             </div>
         @endif
 
-        <section class="order-details">
-            <h2>Informations de la Commande</h2>
-            <p><strong>Utilisateur :</strong> {{ $order->user->name }}</p>
-            <p><strong>Statut :</strong> 
-              
-                    {{ $order->status->label() }}
-               
-            </p>
-            <p><strong>Montant Total :</strong> {{ number_format($order->total_amount, 2) }} FCFA</p>
-            <p><strong>Date de Création :</strong> {{ $order->created_at->format('d/m/Y H:i') }}</p>
-
-            <h2>Livres Commandés</h2>
-            <table>
-                <thead>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Paiement</th>
+                    <th>Commande</th>
+                    <th>Montant</th>
+                    <th>Date de Paiement</th>
+                    <th>Méthode</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($payments as $payment)
                     <tr>
-                        <th>Titre</th>
-                        <th>Quantité</th>
-                        <th>Prix Unitaire</th>
-                        <th>Total</th>
+                        <td>{{ $payment->id }}</td>
+                        <td>{{ $payment->order->id }}</td>
+                        <td>{{ number_format($payment->amount, 2) }} FCFA</td>
+                        <td>{{ $payment->payment_date->format('d/m/Y') }}</td>
+                        <td>{{ $payment->payment_method }}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach ($order->books as $book)
-                        <tr>
-                            <td>{{ $book->title }}</td>
-                            <td>{{ $book->pivot->quantity }}</td>
-                            <td>{{ number_format($book->pivot->price, 2) }} FCFA</td>
-                            <td>{{ number_format($book->pivot->price * $book->pivot->quantity, 2) }} FCFA</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </section>
+                @empty
+                    <tr>
+                        <td colspan="5">Aucun paiement trouvé.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
-
-    <footer>
-        <div class="footer-content">
-            <p>© {{ date('Y') }} Gestion Librairies. Tous droits réservés.</p>
-        </div>
-    </footer>
 </body>
 </html>

@@ -5,47 +5,55 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use App\Models\Order;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
-class InvoiceMail extends Mailable
+class InvoiceEmail extends Mailable
 {
     use Queueable, SerializesModels;
     public $order;
-    public $pdfPath;
+    protected $pdfPath;
+    /**
+     * Create a new message instance.
+     *
+     * @param Order $order
+     * @param string $pdfPath
+     */
 
     /**
      * Create a new message instance.
      */
-    public function __construct($order, $pdfPath)
+    public function __construct(Order $order, $pdfPath)
     {
         $this->order = $order;
         $this->pdfPath = $pdfPath;
-        $this->onQueue('emails');
     }
-
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Invoice Mail',
+            subject: 'Invoice Email',
         );
     }
 
-    /**
-     * Build the message.
-     */
     public function build()
     {
-        return $this->subject('Votre facture pour la commande #' . $this->order->id)
-            ->view('emails.invoice')
-            ->attach($this->pdfPath, [
-                'as' => 'facture-commande-' . $this->order->id . '.pdf',
-                'mime' => 'application/pdf',
-            ]);
+        return $this->markdown('emails.invoice')
+                    ->subject('Votre facture pour la commande #' . $this->order->id)
+                    ->attach($this->pdfPath, [
+                        'as' => 'facture-commande-' . $this->order->id . '.pdf',
+                        'mime' => 'application/pdf',
+                    ]);
     }
 
     /**
@@ -54,10 +62,15 @@ class InvoiceMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            markdown: 'emails.invoice',
         );
     }
-
+    public function __destruct()
+    {
+        if (file_exists($this->pdfPath)) {
+            unlink($this->pdfPath);
+        }
+    }
     /**
      * Get the attachments for the message.
      *

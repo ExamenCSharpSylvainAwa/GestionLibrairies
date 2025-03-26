@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Enums\OrderStatus;
+use Carbon\Carbon;
+use App\Models\Order;
+use App\Models\Payment;
 
-class StatsController extends Controller
+class StatisticsController extends Controller
 {
     public function __construct()
     {
@@ -23,9 +27,10 @@ class StatsController extends Controller
         $revenueToday = Payment::whereDate('payment_date', $today)
             ->sum('amount');
 
-        $ordersPerMonth = Order::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+        // Modifie MONTH(created_at) par EXTRACT(MONTH FROM created_at)
+        $ordersPerMonth = Order::selectRaw('EXTRACT(MONTH FROM created_at) as month, COUNT(*) as count')
             ->whereYear('created_at', $today->year)
-            ->groupBy('month')
+            ->groupByRaw('EXTRACT(MONTH FROM created_at)') // Utilise groupByRaw pour regrouper par la même expression
             ->pluck('count', 'month')
             ->toArray();
 
@@ -37,7 +42,7 @@ class StatsController extends Controller
             ->pluck('count', 'books.category')
             ->toArray();
 
-        return view('stats.index', compact(
+        return view('statistics.index', compact(
             'ordersToday',
             'completedOrdersToday',
             'revenueToday',

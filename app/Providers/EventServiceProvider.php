@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Auth\Events\Registered;
+use App\Models\Order;
+use App\Observers\OrderObserver;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -23,9 +25,14 @@ class EventServiceProvider extends ServiceProvider
     /**
      * Register any events for your application.
      */
-    public function boot(): void
+    /**
+     * Register any events for your application.
+     *
+     * @return void
+     */
+    public function boot():void
     {
-        //
+        Order::observe(OrderObserver::class);
     }
 
     /**

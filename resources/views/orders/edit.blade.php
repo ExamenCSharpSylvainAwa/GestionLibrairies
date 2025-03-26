@@ -131,7 +131,10 @@
             margin-bottom: 8px;
             color: var(--dark);
         }
-        
+        .footer-content {
+                flex-direction: column;
+                gap: 10px;
+            }
         .form-group select,
         .form-group input {
             width: 100%;
@@ -196,19 +199,7 @@
                 @csrf
                 @method('PUT')
 
-                <div class="form-group">
-                    <label for="status">Statut</label>
-                    <select name="status" id="status" required>
-                        <option value="En attente" {{ $order->status === 'pending' ? 'selected' : '' }}>En attente</option>
-                        <option value="En préparation" {{ $order->status === 'processing' ? 'selected' : '' }}>En préparation</option>
-                        <option value="Expédiée" {{ $order->status === 'shipped' ? 'selected' : '' }}>Expédiée</option>
-                        <option value="Livrée" {{ $order->status === 'delivered' ? 'selected' : '' }}>Livrée</option>
-                        <option value="Annulée" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Annulée</option>
-                    </select>
-                    @error('status')
-                        <span class="text-danger">{{ $message }}</span>
-                    @enderror
-                </div>
+                
 
                 <div class="form-group">
                     <label>Livres</label>
@@ -232,5 +223,10 @@
             </form>
         </section>
     </div>
+    <footer>
+        <div class="footer-content">
+            <p>© {{ date('Y') }} Gestion Librairies. Tous droits réservés.</p>
+        </div>
+    </footer>
 </body>
 </html>

@@ -9,20 +9,17 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InvoiceMail extends Mailable
+class OrderPaid extends Mailable
 {
     use Queueable, SerializesModels;
     public $order;
-    public $pdfPath;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($order, $pdfPath)
+    public function __construct()
     {
         $this->order = $order;
-        $this->pdfPath = $pdfPath;
-        $this->onQueue('emails');
     }
 
     /**
@@ -31,21 +28,8 @@ class InvoiceMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Invoice Mail',
+            subject: 'Order Paid',
         );
-    }
-
-    /**
-     * Build the message.
-     */
-    public function build()
-    {
-        return $this->subject('Votre facture pour la commande #' . $this->order->id)
-            ->view('emails.invoice')
-            ->attach($this->pdfPath, [
-                'as' => 'facture-commande-' . $this->order->id . '.pdf',
-                'mime' => 'application/pdf',
-            ]);
     }
 
     /**
@@ -54,8 +38,19 @@ class InvoiceMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            markdown: 'emails.order-paid',
         );
+    }
+    public function build()
+    {
+        // Générer le PDF directement ici
+        $pdf = Pdf::loadView('invoices.order_invoice', ['order' => $this->order]);
+
+        return $this->subject('Votre commande a été expédiée')
+                    ->view('emails.order_shipped')
+                    ->attachData($pdf->output(), 'facture-'.$this->order->id.'.pdf', [
+                        'mime' => 'application/pdf',
+                    ]);
     }
 
     /**

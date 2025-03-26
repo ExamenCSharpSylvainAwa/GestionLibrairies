@@ -15,6 +15,7 @@
             --success: #2ecc71;
             --warning: #f39c12;
             --danger: #e74c3c;
+            --border-color: #e0e0e0;
         }
         
         * {
@@ -90,12 +91,15 @@
         
         .nav-buttons {
             display: flex;
+            justify-content: flex-end;
             gap: 10px;
             flex-wrap: wrap;
+            align-items: center;
         }
         
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             padding: 12px 24px;
             border-radius: 30px;
             text-decoration: none;
@@ -107,6 +111,10 @@
             font-size: 0.9rem;
         }
         
+        .btn i {
+            margin-right: 8px;
+        }
+        
         .btn-primary {
             background-color: var(--secondary);
             color: white;
@@ -115,6 +123,7 @@
         .btn-primary:hover {
             background-color: #2980b9;
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
         
         .btn-success {
@@ -125,6 +134,7 @@
         .btn-success:hover {
             background-color: #27ae60;
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
         
         .btn-warning {
@@ -135,6 +145,7 @@
         .btn-warning:hover {
             background-color: #e67e22;
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
         
         .btn-danger {
@@ -145,6 +156,7 @@
         .btn-danger:hover {
             background-color: #c0392b;
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
         
         .btn-icon {
@@ -278,20 +290,6 @@
             margin-top: 20px;
         }
         
-        .order-form {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .quantity-input {
-            width: 60px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
         .admin-actions {
             display: flex;
             flex-direction: column;
@@ -316,6 +314,97 @@
         .text-danger {
             color: var(--danger);
             font-size: 0.9rem;
+        }
+
+        .orders-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 40px;
+        }
+
+        .orders-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .pagination a, .pagination span {
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: var(--dark);
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background-color: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .pagination .current {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.1);
+            background-image: linear-gradient(135deg, #2c3e50 0%, #4a6785 100%);
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 0 40px;
+        }
+
+        .footer-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
         
         @media (max-width: 768px) {
@@ -344,6 +433,12 @@
             
             .admin-actions {
                 align-items: center;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+                padding: 0 20px;
             }
         }
     </style>
@@ -378,9 +473,18 @@
                             <a href="{{ route('orders.index') }}" class="btn btn-primary">
                                 <i class="fas fa-list"></i> Toutes les Commandes
                             </a>
+                            <a href="{{ route('payments.index') }}" class="btn btn-primary">
+                                <i class="fas fa-money-bill"></i> Paiements
+                            </a>
+                            <a href="{{ route('statistics.index') }}" class="btn btn-primary">
+                                <i class="fas fa-chart-bar"></i> Statistiques
+                            </a>
                         @elseif (auth()->check() && !auth()->user()->isGestionnaire())
                             <a href="{{ route('orders.my_orders') }}" class="btn btn-primary">
                                 <i class="fas fa-list"></i> Mes Commandes
+                            </a>
+                            <a href="#orders-section" class="btn btn-primary">
+                                <i class="fas fa-file-invoice"></i> Mes Factures
                             </a>
                         @endif
                         @if (auth()->check())
@@ -391,8 +495,8 @@
                                 </button>
                             </form>
                         @else
-                            <a href="{{ route('login') }}" class="btn btn-primary">
-                                <i class="fas fa-sign-in-alt"></i> Connexion
+                            <a href="{{ route('login') }}" class="btn btn-primary btn-icon" title="Connexion">
+                                <i class="fas fa-sign-in-alt"></i>
                             </a>
                         @endif
                     </div>
@@ -423,18 +527,23 @@
         <section class="filter-section">
             <form class="filter-form" method="GET" action="{{ route('books.index') }}">
                 <div class="filter-group">
-                    <input type="text" name="category" class="form-control" placeholder="Catégorie" value="{{ request('category') }}">
+                    <input type="text" name="category" class="form-control" placeholder="Catégorie" value="{{ request('category') ?? '' }}">
                 </div>
                 <div class="filter-group">
-                    <input type="text" name="author" class="form-control" placeholder="Auteur" value="{{ request('author') }}">
+                    <input type="text" name="author" class="form-control" placeholder="Auteur" value="{{ request('author') ?? '' }}">
                 </div>
                 <div class="filter-group">
-                    <input type="number" name="price" class="form-control" placeholder="Prix max" value="{{ request('price') }}">
+                    <input type="number" name="price" class="form-control" placeholder="Prix max" value="{{ request('price') ?? '' }}" min="0" step="0.01">
                 </div>
                 <div class="filter-group">
                     <button type="submit" class="btn btn-primary" style="width:100%">
                         <i class="fas fa-filter"></i> Filtrer
                     </button>
+                </div>
+                <div class="filter-group">
+                    <a href="{{ route('books.index') }}" class="btn btn-danger" style="width:100%">
+                        <i class="fas fa-times"></i> Réinitialiser
+                    </a>
                 </div>
             </form>
         </section>
@@ -468,14 +577,9 @@
                             <p class="book-stock">Stock: {{ $book->stock }} disponibles</p>
                             <div class="card-actions">
                                 @if (auth()->check() && !auth()->user()->isGestionnaire() && $book->stock > 0)
-                                    <form class="order-form" method="POST" action="{{ route('orders.store') }}">
-                                        @csrf
-                                        <input type="hidden" name="books[0][id]" value="{{ $book->id }}">
-                                        <input type="number" name="books[0][quantity]" value="1" min="1" max="{{ $book->stock }}" class="quantity-input">
-                                        <button type="submit" class="btn btn-success btn-sm">
-                                            <i class="fas fa-shopping-cart"></i> Commander
-                                        </button>
-                                    </form>
+                                    <a href="{{ route('books.show', $book) }}" class="btn btn-success btn-sm">
+                                        <i class="fas fa-shopping-cart"></i> Commander
+                                    </a>
                                 @elseif ($book->stock <= 0)
                                     <p class="text-danger">Rupture de stock</p>
                                 @endif
@@ -499,10 +603,65 @@
                 @endforeach
             @endif
         </section>
+
+        <!-- Ajouter les liens de pagination -->
+        <div class="pagination">
+            {{ $books->links() }}
+        </div>
+
+        @if (auth()->check() && !auth()->user()->isGestionnaire())
+            <section class="orders-section" id="orders-section">
+                <h2>Mes Factures</h2>
+                @if ($orders->isEmpty())
+                    <div class="empty-state">
+                        <h3>Aucune commande trouvée</h3>
+                        <p>Commencez par passer une commande pour voir vos factures ici.</p>
+                    </div>
+                @else
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Commande</th>
+                                <th>Montant Total</th>
+                                <th>Statut</th>
+                                <th>Facture</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($orders as $order)
+                                <tr>
+                                    <td>{{ $order->id }}</td>
+                                    <td>{{ number_format($order->total_amount, 2) }} FCFA</td>
+                                    <td>
+                                     
+                                            {{ $order->status->label() }}
+                                       
+                                    </td>
+                                    <td>
+                                        @if (in_array($order->status, [\App\Enums\OrderStatus::SHIPPED, \App\Enums\OrderStatus::PAID]))
+                                            <a href="{{ route('orders.download_invoice', $order->id) }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-download"></i> Télécharger
+                                            </a>
+                                        @else
+                                            <span class="text-danger">Non disponible</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+            </section>
+        @endif
     </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>© {{ date('Y') }} Gestion Librairies. Tous droits réservés.</p>
+        </div>
+    </footer>
   
     <script>
-        // Gestion du stock bas
         document.addEventListener('DOMContentLoaded', function() {
             const stockElements = document.querySelectorAll('.book-stock');
             stockElements.forEach(element => {
@@ -514,7 +673,6 @@
             });
         });
 
-        // Fonction de confirmation pour l'archivage
         function confirmArchive(button) {
             if (confirm('Êtes-vous sûr de vouloir archiver ce livre ?')) {
                 button.closest('form').submit();

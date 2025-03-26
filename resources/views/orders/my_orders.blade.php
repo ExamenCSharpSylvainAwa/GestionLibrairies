@@ -15,6 +15,7 @@
             --success: #2ecc71;
             --warning: #f39c12;
             --danger: #e74c3c;
+            --border-color: #e0e0e0;
         }
         
         * {
@@ -95,7 +96,8 @@
         }
         
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             padding: 12px 24px;
             border-radius: 30px;
             text-decoration: none;
@@ -107,6 +109,10 @@
             font-size: 0.9rem;
         }
         
+        .btn i {
+            margin-right: 8px;
+        }
+        
         .btn-primary {
             background-color: var(--secondary);
             color: white;
@@ -115,6 +121,7 @@
         .btn-primary:hover {
             background-color: #2980b9;
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
         
         .btn-success {
@@ -125,6 +132,7 @@
         .btn-success:hover {
             background-color: #27ae60;
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
         
         .btn-warning {
@@ -135,6 +143,7 @@
         .btn-warning:hover {
             background-color: #e67e22;
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
         
         .btn-danger {
@@ -145,6 +154,7 @@
         .btn-danger:hover {
             background-color: #c0392b;
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
         
         .btn-icon {
@@ -158,12 +168,85 @@
             font-size: 1.2rem;
         }
         
+        .action-buttons {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            align-items: center;
+        }
+        
         .empty-state {
             text-align: center;
             padding: 40px;
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+        
+        .alert-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .alert-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.1);
+            background-image: linear-gradient(135deg, #2c3e50 0%, #4a6785 100%);
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 0 40px;
+        }
+
+        .footer-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
         
         @media (max-width: 768px) {
@@ -180,6 +263,23 @@
             
             .nav-buttons {
                 justify-content: center;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .action-buttons {
+                flex-direction: row;
+                gap: 6px;
+                justify-content: center;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+                padding: 0 20px;
             }
         }
     </style>
@@ -216,12 +316,12 @@
         </header>
 
         @if (session('success'))
-            <div class="alert alert-success" style="background-color: var(--success); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <div class="alert alert-success">
                 {{ session('success') }}
             </div>
         @endif
         @if (session('error'))
-            <div class="alert alert-danger" style="background-color: var(--danger); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <div class="alert alert-danger">
                 {{ session('error') }}
             </div>
         @endif
@@ -233,53 +333,63 @@
                     <p>Vous n'avez pas encore passé de commande.</p>
                 </div>
             @else
-                <table style="width: 100%; border-collapse: collapse; background-color: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);">
+                <table>
                     <thead>
-                        <tr style="background-color: #2c3e50; color: white;">
-                            <th style="padding: 15px; text-align: left;">Commande #</th>
-                            <th style="padding: 15px; text-align: left;">Livres</th>
-                            <th style="padding: 15px; text-align: left;">Montant Total</th>
-                            <th style="padding: 15px; text-align: left;">Statut</th>
-                            <th style="padding: 15px; text-align: left;">Date</th>
-                            <th style="padding: 15px; text-align: left;">Actions</th>
+                        <tr>
+                            <th>Commande #</th>
+                            <th>Livres</th>
+                            <th>Montant Total</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($orders as $order)
                             <tr>
-                                <td style="padding: 15px;">{{ $order->id }}</td>
-                                <td style="padding: 15px;">
+                                <td>{{ $order->id }}</td>
+                                <td>
                                     @foreach ($order->books as $book)
                                         {{ $book->title }} ({{ $book->pivot->quantity }} x {{ number_format($book->pivot->price, 2) }} FCFA)<br>
                                     @endforeach
                                 </td>
-                                <td style="padding: 15px;">{{ number_format($order->total_amount, 2) }} FCFA</td>
-                                <td style="padding: 15px;">{{ $order->status }}</td>
-                                <td style="padding: 15px;">{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                                <td style="padding: 15px;">
-                                    <!-- Actions pour les gestionnaires -->
-                                    @if (auth()->check() && auth()->user()->isGestionnaire())
-                                        <a href="{{ route('orders.edit', $order->id) }}" class="btn btn-warning btn-icon" title="Modifier">
-                                            <i class="fas fa-edit"></i>
+                                <td>{{ number_format($order->total_amount, 2) }} FCFA</td>
+                                <td>
+                                   
+                                        {{ $order->status->label() }}
+                                  
+                                </td>
+                                <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <!-- Bouton Voir pour tous -->
+                                        <a href="{{ route('orders.show', $order->id) }}" class="btn btn-primary btn-icon" title="Voir les détails">
+                                            <i class="fas fa-eye"></i>
                                         </a>
-                                        <form action="{{ route('orders.destroy', $order->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande ?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-icon" title="Supprimer">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    @endif
-                                    <!-- Action pour les clients : Annuler la commande -->
-                                    @if (auth()->check() && !auth()->user()->isGestionnaire() && auth()->user()->id === $order->user_id && $order->status === 'pending')
-                                        <form action="{{ route('orders.cancel', $order->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-icon" title="Annuler">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
-                                    @endif
+                                        <!-- Actions pour les gestionnaires -->
+                                        @if (auth()->check() && auth()->user()->isGestionnaire())
+                                            <a href="{{ route('orders.edit', $order->id) }}" class="btn btn-warning btn-icon" title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="{{ route('orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande ?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-icon" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                        <!-- Action pour les clients : Annuler la commande -->
+                                        @if (auth()->check() && !auth()->user()->isGestionnaire() && auth()->user()->id === $order->user_id && $order->status === \App\Enums\OrderStatus::PENDING)
+                                            <form action="{{ route('orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-icon" title="Annuler">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -288,5 +398,10 @@
             @endif
         </section>
     </div>
+    <footer>
+        <div class="footer-content">
+            <p>© {{ date('Y') }} Gestion Librairies. Tous droits réservés.</p>
+        </div>
+    </footer>
 </body>
 </html>
