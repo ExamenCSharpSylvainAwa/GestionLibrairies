@@ -5,7 +5,7 @@ pipeline {
         // Définir le nom de l'image Docker
         DOCKER_IMAGE = "laravel-app:${env.BUILD_NUMBER}"
         // Identifiants pour Docker Hub (à configurer dans Jenkins)
-        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
+        DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
     }
 
     stages {
