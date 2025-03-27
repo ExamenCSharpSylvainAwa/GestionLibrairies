@@ -62,6 +62,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index')->middleware('role:gestionnaire');
     Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index')->middleware('role:gestionnaire');
     Route::get('/statistics', [App\Http\Controllers\OrderController::class, 'statistics'])->name('statistics.index')->middleware('role:gestionnaire');
+
+
+    // routes/web.php
+    Route::post('/webhook', [WebhookController::class, 'handle']);
 });
 
 require __DIR__.'/auth.php';
